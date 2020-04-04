@@ -1,8 +1,11 @@
 import argparse
+import logging
 import math
 
 import numpy as np
 import numpy.matlib as ml
+
+logging.basicConfig(level=logging.INFO)
 
 
 def geometric_brownian_motion(allow_negative=False, **kwargs):
@@ -90,4 +93,5 @@ def main():
 
 if __name__ == "__main__":
 
-    main()
+    _curve = main()
+    print(_curve)

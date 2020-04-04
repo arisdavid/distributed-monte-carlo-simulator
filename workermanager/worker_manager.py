@@ -1,4 +1,8 @@
+import logging
+
 from kubernetes import client, config
+
+logging.basicConfig(level=logging.INFO)
 
 config.load_kube_config()
 
@@ -7,12 +11,13 @@ class WorkerManager:
 
     __container_image = "monte-carlo-simulator:latest"
 
-    def __init__(self, namespace, pod_id, container_parameters):
+    def __init__(self, namespace, pod_number, pod_id, container_parameters):
+        self.pod_number = pod_number
         self.container_parameters = container_parameters
         self.namespace = namespace
         self.pod_id = pod_id
         self.metadata = client.V1ObjectMeta(
-            name=f"worker-{pod_id}",
+            name=f"worker-pod{pod_number}-{pod_id}",
             labels={"name": "monte-carlo-simulator", "type": "worker"},
         )
 
@@ -46,3 +51,7 @@ class WorkerManager:
     def launch_worker(self):
         batch_api = client.BatchV1Api()
         batch_api.create_namespaced_job(self.namespace, self.create_job())
+        logging.info(f"Container with id {self.pod_id} launched.")
+
+    def delete_pod(self):
+        pass

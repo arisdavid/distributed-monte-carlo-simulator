@@ -1,7 +1,10 @@
 import argparse
+import logging
 import uuid
 
 from workermanager.worker_manager import WorkerManager
+
+logging.basicConfig(level=logging.INFO)
 
 
 def monte_carlo_simulation(num_sims, model, **kwargs):
@@ -28,32 +31,37 @@ def main(
 ):
 
     # Max Simulations Per Pod
-    partition = 10_000
+    partition = 50_000
 
-    container_parameters = dict(
-        num_simulations=num_simulations,
-        starting_value=starting_value,
-        mu=mu,
-        sigma=sigma,
-        forecast_period=forecast_period_in_days,
-        num_trading_days=num_trading_days,
-    )
     q = 0
     r = 0
     if num_simulations > partition:
         q, r = divmod(num_simulations, partition)
 
-    num_workers = q
-    if num_workers > 1:
+    num_workers = q + 1
+    logging.info(
+        f"App will create {num_workers} pod(s) to handle {num_simulations} simulations."
+    )
 
-        # Spin up worker pods
-        for worker in range(num_workers):
-            worker_obj = WorkerManager(
-                namespace=namespace,
-                pod_id=uuid.uuid4(),
-                container_parameters=container_parameters,
-            )
-            worker_obj.launch_worker()
+    # Spin up worker pods
+    for worker in range(num_workers):
+
+        container_parameters = dict(
+            num_simulations=partition,
+            starting_value=starting_value,
+            mu=mu,
+            sigma=sigma,
+            forecast_period=forecast_period_in_days,
+            num_trading_days=num_trading_days,
+        )
+
+        worker_obj = WorkerManager(
+            namespace=namespace,
+            pod_number=worker + 1,
+            pod_id=uuid.uuid4(),
+            container_parameters=container_parameters,
+        )
+        worker_obj.launch_worker()
 
 
 if __name__ == "__main__":
