@@ -64,7 +64,7 @@ python3 simulator.py k8demo 100000 200 0.2 0.18 365 250
 
 ```
 
-## Delete Jobs Manually for Now
+### Delete jobs manually
 ```
 kubectl delete jobs --all --namespace=k8demo
 ```
