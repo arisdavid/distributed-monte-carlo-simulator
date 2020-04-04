@@ -1,4 +1,4 @@
-from kubernetes import config, client
+from kubernetes import client, config
 
 config.load_kube_config()
 
@@ -13,22 +13,14 @@ class WorkerManager:
         self.pod_id = pod_id
         self.metadata = client.V1ObjectMeta(
             name=f"worker-{pod_id}",
-            labels={
-                "name": "monte-carlo-simulator",
-                "type": "worker"
-            },
+            labels={"name": "monte-carlo-simulator", "type": "worker"},
         )
 
     def create_container(self):
         label = "monte-carlo-simulator"
         image_pull_policy = "Never"
         container = client.V1Container(name=label, image_pull_policy=image_pull_policy)
-        container.args = [str(self.container_parameters["num_simulations"]),
-                          str(self.container_parameters["starting_value"]),
-                          str(self.container_parameters["mu"]),
-                          str(self.container_parameters["sigma"]),
-                          str(self.container_parameters["forecast_period"]),
-                          str(self.container_parameters["num_trading_days"])]
+        container.args = [str(args) for args in self.container_parameters.values()]
         container.image = self.__container_image
 
         return container

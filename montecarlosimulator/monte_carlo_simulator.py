@@ -1,6 +1,6 @@
 import argparse
-
 import math
+
 import numpy as np
 import numpy.matlib as ml
 
@@ -18,11 +18,11 @@ def geometric_brownian_motion(allow_negative=False, **kwargs):
 
     """
 
-    starting_value = kwargs.get('starting_value')
-    mu = kwargs.get('mu')
-    sigma = kwargs.get('sigma')
-    num_trading_days = kwargs.get('num_trading_days')
-    num_per = kwargs.get('forecast_period_in_days')
+    starting_value = kwargs.get("starting_value")
+    mu = kwargs.get("mu")
+    sigma = kwargs.get("sigma")
+    num_trading_days = kwargs.get("num_trading_days")
+    num_per = kwargs.get("forecast_period_in_days")
 
     # Calculate Drift
     mu = mu / num_trading_days
@@ -41,7 +41,7 @@ def geometric_brownian_motion(allow_negative=False, **kwargs):
     asset_path = np.concatenate((starting_value, asset_path), axis=1)
 
     if allow_negative:
-        asset_path *= (asset_path > 0)
+        asset_path *= asset_path > 0
 
     return asset_path.mean(axis=0)
 
@@ -67,24 +67,27 @@ def main():
     parser.add_argument("mu", help="Expected annual return", type=float)
     parser.add_argument("sigma", help="Expected annual volatility", type=float)
     parser.add_argument("forecast_period", help="Forecast period in days", type=int)
-    parser.add_argument("num_trading_days", help="Number of trading days in year", type=int)
+    parser.add_argument(
+        "num_trading_days", help="Number of trading days in year", type=int
+    )
 
     args = parser.parse_args()
-    asset_paths = monte_carlo_simulation(args.num_simulations,
-                                         geometric_brownian_motion,
-                                         starting_value=args.starting_value,
-                                         mu=args.mu,
-                                         sigma=args.sigma,
-                                         forecast_period_in_days=args.forecast_period,
-                                         num_trading_days=args.num_trading_days)
+    asset_paths = monte_carlo_simulation(
+        args.num_simulations,
+        geometric_brownian_motion,
+        starting_value=args.starting_value,
+        mu=args.mu,
+        sigma=args.sigma,
+        forecast_period_in_days=args.forecast_period,
+        num_trading_days=args.num_trading_days,
+    )
 
     for asset_path in asset_paths:
-        curve = + asset_path
+        curve = +asset_path
 
     return curve
 
 
 if __name__ == "__main__":
 
-   print(main())
-
+    main()
