@@ -33,34 +33,36 @@ def main(
     # Max Simulations Per Pod
     partition = 50_000
 
-    q = 0
+    q = 1
     r = 0
     if num_simulations > partition:
         q, r = divmod(num_simulations, partition)
 
-    num_workers = q + 1
+    num_workers = q
     logging.info(
         f"App will create {num_workers} pod(s) to handle {num_simulations} simulations."
     )
 
     # Spin up worker pods
+    container_parameters = dict(
+        num_simulations=partition,
+        starting_value=starting_value,
+        mu=mu,
+        sigma=sigma,
+        forecast_period=forecast_period_in_days,
+        num_trading_days=num_trading_days,
+    )
+
+    worker_obj = WorkerManager(namespace=namespace)
+
+    # Delete old pods
+    worker_obj.delete_previous_pods()
+
     for worker in range(num_workers):
 
-        container_parameters = dict(
-            num_simulations=partition,
-            starting_value=starting_value,
-            mu=mu,
-            sigma=sigma,
-            forecast_period=forecast_period_in_days,
-            num_trading_days=num_trading_days,
-        )
-
-        worker_obj = WorkerManager(
-            namespace=namespace,
-            pod_number=worker + 1,
-            pod_id=uuid.uuid4(),
-            container_parameters=container_parameters,
-        )
+        worker_obj.pod_id = uuid.uuid4()
+        worker_obj.container_parameters = container_parameters
+        worker_obj.pod_number = worker + 1
         worker_obj.launch_worker()
 
 
