@@ -47,7 +47,7 @@ def main(
     worker_obj = WorkerManager(namespace=namespace)
 
     # Delete old pods
-    worker_obj.delete_previous_pods()
+    worker_obj.remove_old_pods()
 
     for worker in range(num_workers):
 
@@ -64,6 +64,8 @@ def main(
         worker_obj.container_parameters = container_parameters
         worker_obj.pod_number = worker + 1
         worker_obj.launch_worker()
+
+    # Get pod status and delete them when done
 
 
 if __name__ == "__main__":

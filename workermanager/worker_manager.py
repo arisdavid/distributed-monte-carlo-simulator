@@ -92,7 +92,7 @@ class WorkerManager:
         batch_api.create_namespaced_job(self.namespace, self.create_job())
         logging.info(f"Pod with id {self.pod_id} launched.")
 
-    def delete_previous_pods(self):
+    def remove_old_pods(self):
 
         """ Delete pods that succeeded previously """
         pods = self.core_api.list_namespaced_pod(
