@@ -3,7 +3,7 @@ Distributing Monte Carlo Simulator jobs across multiple Kubernetes worker (ephem
 Partition default is currently set to 50,000 simulations. 
 
 #### Screenshots
-![Image of K9s](https://github.com/arisdavid/distributed-monte-carlo-simulator/static/img/mcgbm.png)
+![Image of K9s](https://github.com/arisdavid/distributed-monte-carlo-simulator/blob/master/static/img/mcgbm.png)
  
 
 ## Local Development
