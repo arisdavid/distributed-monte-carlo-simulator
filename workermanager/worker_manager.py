@@ -8,6 +8,7 @@ config.load_kube_config()
 
 
 class WorkerManager:
+
     _container_image = "monte-carlo-simulator:latest"
     _pod_labels = {"name": "monte-carlo-simulator", "type": "pod"}
 
@@ -89,7 +90,7 @@ class WorkerManager:
     def launch_worker(self):
         batch_api = client.BatchV1Api()
         batch_api.create_namespaced_job(self.namespace, self.create_job())
-        logging.info(f"Container with id {self.pod_id} launched.")
+        logging.info(f"Pod with id {self.pod_id} launched.")
 
     def delete_previous_pods(self):
 
