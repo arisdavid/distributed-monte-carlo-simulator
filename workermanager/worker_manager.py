@@ -17,6 +17,7 @@ class WorkerManager:
         self.namespace = namespace
 
         # Pod parameters
+        self._pod_parameters = None
         self._pod_number = None
         self._pod_id = None
 
@@ -28,20 +29,12 @@ class WorkerManager:
         self.core_api = client.CoreV1Api()
 
     @property
-    def pod_number(self):
-        return self._pod_number
+    def pod_parameters(self):
+        return self._pod_parameters
 
-    @pod_number.setter
-    def pod_number(self, n):
-        self._pod_number = n
-
-    @property
-    def pod_id(self):
-        return self._pod_id
-
-    @pod_id.setter
-    def pod_id(self, pid):
-        self._pod_id = pid
+    @pod_parameters.setter
+    def pod_parameters(self, params):
+        self._pod_parameters = params
 
     @property
     def container_parameters(self):
@@ -63,7 +56,8 @@ class WorkerManager:
     def create_pod_template(self):
 
         metadata = client.V1ObjectMeta(
-            name=f"worker-pod{self.pod_number}-{self.pod_id}", labels=self._pod_labels
+            name=f"worker-pod{self._pod_parameters['pod_number']}-{self._pod_parameters['pod_id']}",
+            labels=self._pod_labels,
         )
         pod_template = client.V1PodTemplateSpec(metadata=metadata)
         pod_template.spec = client.V1PodSpec(
@@ -74,7 +68,7 @@ class WorkerManager:
 
     def create_job(self):
         metadata = client.V1ObjectMeta(
-            name=f"worker-pod{self.pod_number}-{self.pod_id}",
+            name=f"worker-pod{self._pod_parameters['pod_number']}-{self._pod_parameters['pod_id']}",
             labels={"name": "monte-carlo-simulator", "type": "job"},
         )
 
@@ -90,7 +84,7 @@ class WorkerManager:
     def launch_worker(self):
         batch_api = client.BatchV1Api()
         batch_api.create_namespaced_job(self.namespace, self.create_job())
-        logging.info(f"Pod with id {self.pod_id} launched.")
+        logging.info(f"Pod with id {self._pod_parameters['pod_id']} launched.")
 
     def remove_old_pods(self):
 

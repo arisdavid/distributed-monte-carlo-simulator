@@ -60,9 +60,10 @@ def main(
             num_trading_days=num_trading_days,
         )
 
-        worker_obj.pod_id = uuid.uuid4()
+        pod_parameters = dict(pod_id=uuid.uuid4(), pod_number=worker + 1)
+
+        worker_obj.pod_parameters = pod_parameters
         worker_obj.container_parameters = container_parameters
-        worker_obj.pod_number = worker + 1
         worker_obj.launch_worker()
 
     # Get pod status and delete them when done
