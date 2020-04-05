@@ -46,7 +46,8 @@ def main(
     # Spin up worker pods
     worker_obj = WorkerManager(namespace=namespace)
 
-    # Delete old pods
+    # Delete old jobs and pods
+    worker_obj.remove_old_jobs()
     worker_obj.remove_old_pods()
 
     for worker in range(num_workers):
@@ -62,9 +63,12 @@ def main(
 
         pod_parameters = dict(pod_id=uuid.uuid4(), pod_number=worker + 1)
 
+        job_parameters = dict(job_id=uuid.uuid4(), job_number=worker + 1)
+
         worker_obj.pod_parameters = pod_parameters
+        worker_obj.job_parameters = job_parameters
         worker_obj.container_parameters = container_parameters
-        worker_obj.launch_worker()
+        worker_obj.launch_pod()
 
     # Get pod status and delete them when done
 

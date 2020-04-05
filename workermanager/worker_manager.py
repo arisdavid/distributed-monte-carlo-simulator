@@ -11,22 +11,28 @@ class WorkerManager:
 
     _container_image = "monte-carlo-simulator:latest"
     _pod_labels = {"name": "monte-carlo-simulator", "type": "pod"}
+    _job_labels = {"job_name": "monte-carlo-simulator", "type": "job"}
 
     def __init__(self, namespace):
 
         self.namespace = namespace
 
-        # Pod parameters
+        # Parameters
         self._pod_parameters = None
-        self._pod_number = None
-        self._pod_id = None
-
-        # Container parameters
-        self.container_parameters = None
+        self._container_parameters = None
+        self._job_parameters = None
 
         # Kubernetes API
         self.batch_api = client.BatchV1Api()
         self.core_api = client.CoreV1Api()
+
+    @property
+    def job_parameters(self):
+        return self._job_parameters
+
+    @job_parameters.setter
+    def job_parameters(self, params):
+        self._job_parameters = params
 
     @property
     def pod_parameters(self):
@@ -55,11 +61,11 @@ class WorkerManager:
 
     def create_pod_template(self):
 
-        metadata = client.V1ObjectMeta(
-            name=f"worker-pod{self._pod_parameters['pod_number']}-{self._pod_parameters['pod_id']}",
+        pod_metadata = client.V1ObjectMeta(
+            name=f"mc-pod-{self._pod_parameters['pod_number']}-{self._pod_parameters['pod_id']}",
             labels=self._pod_labels,
         )
-        pod_template = client.V1PodTemplateSpec(metadata=metadata)
+        pod_template = client.V1PodTemplateSpec(metadata=pod_metadata)
         pod_template.spec = client.V1PodSpec(
             containers=[self.create_container()], restart_policy="Never"
         )
@@ -67,24 +73,37 @@ class WorkerManager:
         return pod_template
 
     def create_job(self):
-        metadata = client.V1ObjectMeta(
-            name=f"worker-pod{self._pod_parameters['pod_number']}-{self._pod_parameters['pod_id']}",
-            labels={"name": "monte-carlo-simulator", "type": "job"},
+
+        job_metadata = client.V1ObjectMeta(
+            name=f"mc-job-{self._job_parameters['job_number']}-{self._job_parameters['job_id']}",
+            labels=self._job_labels,
         )
 
         job = client.V1Job(
             spec=client.V1JobSpec(backoff_limit=0, template=self.create_pod_template()),
-            metadata=metadata,
+            metadata=job_metadata,
             kind="Job",
             api_version="batch/v1",
         )
 
         return job
 
-    def launch_worker(self):
+    def launch_pod(self):
+
         batch_api = client.BatchV1Api()
         batch_api.create_namespaced_job(self.namespace, self.create_job())
-        logging.info(f"Launching pod with id {self._pod_parameters['pod_id']}.")
+        logging.info(f"Launching pod number {self._pod_parameters['pod_number']}.")
+
+    def remove_old_jobs(self):
+
+        """ Delete old jobs """
+        jobs = self.batch_api.list_namespaced_job(namespace=self.namespace)
+
+        for job in jobs.items:
+            if job.status.succeeded:
+                self.batch_api.delete_namespaced_job(
+                    namespace=self.namespace, name=job.metadata.name,
+                )
 
     def remove_old_pods(self):
 
