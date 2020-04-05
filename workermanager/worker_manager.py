@@ -84,7 +84,7 @@ class WorkerManager:
     def launch_worker(self):
         batch_api = client.BatchV1Api()
         batch_api.create_namespaced_job(self.namespace, self.create_job())
-        logging.info(f"Pod with id {self._pod_parameters['pod_id']} launched.")
+        logging.info(f"Launching pod with id {self._pod_parameters['pod_id']}.")
 
     def remove_old_pods(self):
 
