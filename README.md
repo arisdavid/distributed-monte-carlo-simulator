@@ -3,7 +3,7 @@ Distributing Monte Carlo Simulator jobs across multiple Kubernetes worker (ephem
 Partition default is currently set to 50,000 simulations. 
 
 ### Model
-There is currently one model: Geometric Brownian Motion. This model is used to model Stock prices.
+There is currently one model: Geometric Brownian Motion. This model is widely applied in Finance to model Stock prices.
 GBM says the change in stock price is the stock price "S" multiplied by the two terms. 
 
 ![Image of GBM](https://github.com/arisdavid/distributed-monte-carlo-simulator/blob/master/static/img/eq.png)
