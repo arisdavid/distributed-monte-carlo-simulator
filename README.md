@@ -1,10 +1,24 @@
 ## Introduction
-Distributing Monte Carlo Simulator jobs across multiple Kubernetes worker (ephemeral pods). 
+Distributing Monte Carlo Simulator jobs across multiple Kubernetes worker (ephemeral pods).
 Partition default is currently set to 50,000 simulations. 
 
-#### Screenshots
+### Model
+There is currently one model: Geometric Brownian Motion. This model is used to model Stock prices.
+GBM says the change in stock price is the stock price "S" multiplied by the two terms. 
+
+![Image of GBM](https://github.com/arisdavid/distributed-monte-carlo-simulator/blob/master/static/img/eq.png)
+
+The first term is a "drift" and the second term is a "shock." 
+For each time period, our model assumes the price will "drift" up by the expected return. 
+But the drift will be shocked (added or subtracted) by a random shock. 
+The random shock will be the standard deviation "s" multiplied by a random number "e." 
+This is simply a way of scaling the standard deviation.
+
+![Image of GBM](https://github.com/arisdavid/distributed-monte-carlo-simulator/blob/master/static/img/gbm.png)
+
+#### Kubernetes Cluster
 ![Image of K9s](https://github.com/arisdavid/distributed-monte-carlo-simulator/blob/master/static/img/mcgbm.png)
- 
+
 
 ## Local Development
 
